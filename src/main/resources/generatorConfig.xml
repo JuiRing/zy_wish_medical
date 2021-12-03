@@ -47,27 +47,19 @@
             <property name="useActualColumnNames"
                       value="true"/>
         </table>-->
-        <table tableName="Team">
+        <table tableName="user">
             <property name="useActualColumnNames"
                       value="true"/>
         </table>
-        <table tableName="Player">
+        <table tableName="role_menu">
             <property name="useActualColumnNames"
                       value="true"/>
         </table>
-        <table tableName="game">
+        <table tableName="role">
             <property name="useActualColumnNames"
                       value="true"/>
         </table>
-        <table tableName="gameRecord">
-            <property name="useActualColumnNames"
-                      value="true"/>
-        </table>
-        <table tableName="Admins">
-            <property name="useActualColumnNames"
-                      value="true"/>
-        </table>
-        <table tableName="AdminRole">
+        <table tableName="menu">
             <property name="useActualColumnNames"
                       value="true"/>
         </table>

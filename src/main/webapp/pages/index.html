@@ -27,7 +27,7 @@
             <!--<li class="nav-item dl-selected"><div class="nav-item-inner nav-home">信息采编系统</div></li>-->
 			<li style=" color:#fff; font-size:20px; margin-top:10px; margin-left:20px;">山东省第二人民医院管理平台</li>
 		</ul>
-		<div  style="float:right; color:#fff;">欢迎您，<span class="dl-log-user">张三</span><a href="/chinapost/index.php?m=Public&a=logout" title="退出系统" class="dl-log-quit">[退出]</a></div>
+		<div  style="float:right; color:#fff;">欢迎您，<span class="dl-log-user" id="username"></span><a href="/user/logout" class="dl-log-quit">[退出]</a></div>
     </div>
 	
     <ul id="J_NavContent" class="dl-tab-conten">
@@ -40,27 +40,17 @@
 
 
 <script>
-    BUI.use('common/main',function(){
+/*    BUI.use('common/main',function(){
         var config = [
 		{id:'1',menu:[
-		
 		{text:'快速通道',items:[
-		
-		{id:'2',text:'挂号信息管理',href:'registration/index.html'},		
-		
+		{id:'2',text:'挂号信息管理',href:'registration/index.html'},
 		{id:'5',text:'住院办理',href:'hospital/index.html'},
 		{id:'8',text:'住院结算',href:'hospital/account.html'},
-		
 		{id:'7',text:'在院发药',href:'hospital/dispensing.html'},
 		{id:'4',text:'药品管理',href:'medicine/index.html'},
-		
 		{id:'16',text:'检查收费项目登记',href:'hospital/charge2.html'},
-		{id:'6',text:'收费项目管理',href:'hospital/charge.html'},		
-	
-		/** 扩展
-		{id:'9',text:'月营业额统计',href:''},
-		{id:'10',text:'年营业额统计',href:''},
-		**/
+		{id:'6',text:'收费项目管理',href:'hospital/charge.html'},
 		{id:'3',text:'门诊医生管理',href:'doctor/index.html'},
 		{id:'11',text:'用户管理',href:'User/index.html'},
 		{id:'12',text:'角色管理',href:'Role/index.html'},
@@ -74,7 +64,39 @@
         new PageUtil.MainPage({
             modulesConfig : config
         });
-    });
+    });*/
+
+    $(function (){
+        //根据登录用户的角色渲染侧边栏
+        $.ajax({
+            type: "GET",
+            url: "/user/loadRole",
+            dataType: "json",
+            success: function (vo) {
+                $("#username").html(vo.user.u_trueName);
+                let menuList = vo.menuList;
+                //console.log(menuList);
+                let items1 = [];
+                for (let i = 0; i < menuList.length; i++) {
+                    let item = new Object();
+                    item.id=menuList[i].m_id;
+                    item.text=menuList[i].m_name;
+                    item.href=menuList[i].m_url;
+                    items1.push(item);
+                }
+                BUI.use('common/main',function(){
+                    var config = [
+                        {id:'1',menu:[
+                                {text:'快速通道',items:items1}
+                            ]}
+                    ];
+                    new PageUtil.MainPage({
+                        modulesConfig : config
+                    });
+                });
+            }
+        });
+    })
 </script>
 </body>
 </html>

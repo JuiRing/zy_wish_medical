@@ -48,16 +48,47 @@
 </head>
 <body>
 <div class="container">
+    <form class="form-signin" method="post">
+        <h2 class="form-signin-heading">登录系统</h2>
+        <input type="text" id="username" name="username" class="input-block-level" placeholder="账号">
+        <input type="password" id="password" name="password" class="input-block-level" placeholder="密码">
+        <input type="text" id="inputVerify" name="verify" class="input-medium" placeholder="验证码"><span id="randomVerify"></span>
 
-    <form class="form-signin" method="post" action="index.html#1/2">
-        <h2 class="form-signin-heading">&nbsp;&nbsp;&nbsp;登录系统</h2>
-        <input type="text" name="username" class="input-block-level" placeholder="账号">
-        <input type="password" name="password" class="input-block-level" placeholder="密码">
-        <input type="text" name="verify" class="input-medium" placeholder="验证码">7236
        
-        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button class="btn btn-large btn-primary" type="submit">登录</button></p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button class="btn btn-large btn-primary" id="login" type="button">登录</button></p>
     </form>
-
 </div>
+<script>
+    $(function () {
+       let verify = Math.random().toString(36).substring(3, 7);
+       //生成四位数的验证码
+       $("#randomVerify").html(verify);
+        $("#login").click(function () {
+            //发起异步请求
+            $.ajax({
+                type: "POST",
+                url: "/user/login", //RESTful风格的API定义
+                data: {
+                    username:$("#username").val(),
+                    password:$("#password").val(),
+                    inputVerify:$("#inputVerify").val(),
+                    randomVerify:verify,
+                },
+                success: function (vo) {
+                    if (vo.code==200){
+                        window.location.href = "/pages/index.html";
+                    }
+                    if (vo.code==301){
+                        alert(vo.msg);
+                    }
+                    if (vo.code==300){
+                        alert(vo.msg);
+                    }
+                }
+            });
+        })
+    })
+
+</script>
 </body>
 </html>

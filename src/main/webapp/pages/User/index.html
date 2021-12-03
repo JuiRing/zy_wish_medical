@@ -88,19 +88,128 @@
         <th  width="10%">操作</th>
     </tr>
     </thead>
-	     <tr>
-         	<td style="vertical-align:middle;"><input type="checkbox" name="check" value="1"></td>
-            <td>admin</td>
-            <td>管理员</td>
-            <td>管理员</td>
-            <td>
-                <a href="editUser.html">编辑</a>&nbsp;&nbsp;&nbsp;<a href="javascript:alert('删除成功！');">删除</a>             
-            </td>
-        </tr>	
+    <tbody id="tbody">
+    <tr>
+        <td style="vertical-align:middle;"><input type="checkbox" name="check" value="1"></td>
+        <td>admin</td>
+        <td>管理员</td>
+        <td>管理员</td>
+        <td>
+            <a href="editUser.html">编辑</a>&nbsp;&nbsp;&nbsp;<a href="javascript:alert('删除成功！');">删除</a>
+        </td>
+    </tr>
+    </tbody>
+
 </table>
 <table class="table table-bordered table-hover definewidth m10" >
-  	<tr><th colspan="5">  <div class="inline pull-right page">
-         10122 条记录 1/507 页  <a href='#'>下一页</a>     <span class='current'>1</span><a href='#'>2</a><a href='/chinapost/index.php?m=Label&a=index&p=3'>3</a><a href='#'>4</a><a href='#'>5</a>  <a href='#' >下5页</a> <a href='#' >最后一页</a></div><div><button type="button" class="btn btn-success" id="newNav">添加用户</button>&nbsp;&nbsp;&nbsp;<button type="button" class="btn btn-success" id="delPro" onClick="delAll();">删除选中</button></div></th></tr>
+  	<tr>
+        <th colspan="5">
+        <div class="inline pull-right page">
+         共 10122 条记录 1/507 页
+            <a>首页</a>
+            <a>上一页</a>
+            <a>下一页</a>
+            <a>末页</a>
+            每页显示
+            <select style="width: 60px">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="15">15</option>
+           </select>
+        </div>
+            <div>
+                <button type="button" class="btn btn-success" id="newNav">添加用户</button>&nbsp;&nbsp;&nbsp;
+                <button type="button" class="btn btn-success" id="delPro" onClick="delAll();">删除选中</button>
+            </div>
+        </th>
+    </tr>
   </table>
 </body>
+<script>
+    //页面加载完毕之后发送异步请求
+    $(function(){
+        loadData();
+    });
+    //填充分页信息
+    function fillPageData(pageInfo) {
+        //填充信息
+        $("#total").html(pageInfo.total);
+        $("#pages").html(pageInfo.pages);
+        $("input[name='pageNum']").val(pageInfo.pageNum);
+        $("select[name='pageSize']").val(pageInfo.pageSize);
+        //设置按钮的属性值和样式
+        $("#firstPage").attr("name",1);
+        $("#prePage").attr("name",pageInfo.prePage);
+        $("#nextPage").attr("name",pageInfo.nextPage);
+        $("#lastPage").attr("name",pageInfo.pages);
+        $("#firstPage").removeClass("disabled");
+        $("#prePage").removeClass("disabled");
+        $("#nextPage").removeClass("disabled");
+        $("#lastPage").removeClass("disabled");
+        if(pageInfo.isFirstPage){//如果是第一页：上一页和首页禁用
+            $("#firstPage").addClass("disabled");
+            $("#prePage").addClass("disabled");
+        }
+        if(pageInfo.isLastPage){//如果已经是最后一页：下一页和末页禁用
+            $("#nextPage").addClass("disabled");
+            $("#lastPage").addClass("disabled");
+        }
+    }
+    //更新按钮
+    function updateTeam(id) {
+        let pageNum=$("input[name='pageNum']").val();
+        let pageSize=$("select[name='pageSize']").val();
+        window.location.href="/pages/team/update.html?teamId="+id+"&pageNum="+pageNum+"&pageSize="+pageSize;
+    }
+    //删除按钮
+    function deleteTeam(id) {
+        if(confirm("确定要删除吗?")) {
+            //发起异步请求
+            $.ajax({
+                type: "POST",
+                url: "/team/" + id, //RESTful风格的API定义
+                data: "_method=DELETE",
+                success: function (vo) {
+                    if(vo.code==200){
+                        loadData();
+                    }else{
+                        alert("删除失败！"+vo.msg);
+                    }
+                }
+            });
+        }
+    }
+    //加载数据
+    function loadData(){
+        $.ajax({
+            type: "GET",
+            url: "/users/list",
+            dataType:"json",
+            success: function(vo){
+                //alert( "Data Saved: " + vo );
+                let list=vo.pageInfo.list;
+                let str="";
+                for(let i=0;i<list.length;i++){
+                    let obj=list[i];
+                    let userId = obj.u_id;
+                    let loginName=obj.u_loginName;
+                    let realName=obj.u_trueName;
+                    let role=obj.r_id;
+                    let btnStr='<button  onclick="deleteTeam('+userId+')">删除</button>&nbsp;' +
+                        '<button  onclick="updateTeam('+userId+')">更新</button>&nbsp;';
+                    str+='<tr>' +
+                        '            <td><input type="checkbox"/></td>' +
+                        '            <td>'+loginName+'</td>' +
+                        '            <td>'+realName+'</td>' +
+                        '            <td>'+role+'</td>' +
+                        '            <td>'+btnStr+'</td>' +
+                        '</tr>'
+                }
+                $("#tbody").html(str);
+                //填充分页数据
+                fillPageData(vo.pageInfo);
+            }
+        });
+    }
+</script>
 </html>
